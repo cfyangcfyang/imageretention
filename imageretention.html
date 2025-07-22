@@ -1,0 +1,104 @@
+﻿<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>圖片序列播放器</title>
+    <style>
+        /* 讓頁面和圖片充滿整個視窗，並隱藏滾動條 */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #000; /* 背景設為黑色 */
+        }
+        /* 圖片容器樣式 */
+        #imagePlayer {
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* 確保圖片完整顯示，不被裁切 */
+            cursor: pointer; /* 讓滑鼠指標顯示為可點擊的手形 */
+        }
+        /* 載入中的提示文字 */
+        #loadingMessage {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 24px;
+            font-family: sans-serif;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 顯示圖片的元素 -->
+    <img id="imagePlayer" src="imageretention/frame#00.png" alt="正在載入圖片序列...">
+
+    <!-- 載入提示 -->
+    <div id="loadingMessage">正在載入...</div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const imagePlayer = document.getElementById('imagePlayer');
+            const loadingMessage = document.getElementById('loadingMessage');
+            const totalFrames = 60; // 總圖片張數
+            const framePaths = [];
+            const preloadedImages = [];
+
+            // 產生所有圖片的路徑 (從 frame#00.png 到 frame#59.png)
+            for (let i = 0; i < totalFrames; i++) {
+                // 使用 padStart 確保數字總是兩位數 (例如 0, 1, 2 -> 00, 01, 02)
+                const frameNumber = String(i).padStart(2, '0');
+                framePaths.push(`frame_${frameNumber}.png`);
+            }
+
+            let loadedCount = 0;
+
+            // 預載入所有圖片
+            framePaths.forEach(path => {
+                const img = new Image();
+                img.src = path;
+                img.onload = () => {
+                    loadedCount++;
+                    // 當所有圖片都載入完成後
+                    if (loadedCount === totalFrames) {
+                        loadingMessage.style.display = 'none'; // 隱藏載入提示
+                        imagePlayer.style.display = 'block'; // 顯示圖片容器
+                        startPlayback();
+                    }
+                };
+                preloadedImages.push(img);
+            });
+
+            let currentFrame = 0;
+
+            // 開始播放函式
+            function startPlayback() {
+                setInterval(() => {
+                    // 更新圖片來源以顯示下一幀
+                    imagePlayer.src = preloadedImages[currentFrame].src;
+                    currentFrame++;
+                    // 如果播放到最後一張，則從頭開始，實現重複播放
+                    if (currentFrame >= totalFrames) {
+                        currentFrame = 0;
+                    }
+                }, 16.7); // 每 16.7 毫秒更新一次 (約 60 FPS)
+            }
+
+            // 返回頁面的函式
+            function goBack() {
+                window.location.href = 'imageretention.html';
+            }
+
+            // 監聽滑鼠點擊和螢幕觸碰事件
+            document.addEventListener('click', goBack);
+            document.addEventListener('touchstart', goBack);
+        });
+    </script>
+
+</body>
+</html>
