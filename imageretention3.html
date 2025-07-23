@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>圖片序列播放</title>
+<style>
+  #image-sequence {
+    width: 100%;
+    height: auto;
+  }
+</style>
+</head>
+<body>
+
+<img id="image-sequence" src="Frame_00.png" alt="圖片序列">
+
+<script>
+  // 圖片設定
+  const imagePrefix = 'Frame_';
+  const imageSuffix = '.png';
+  const totalFrames = 60; // 總圖片張數 (00 到 59)
+  const frameRate = 10; // 每張圖片顯示時間 (毫秒)
+
+  let currentFrame = 0;
+  const imageElement = document.getElementById('image-sequence');
+
+  // 預載入圖片
+  const images = [];
+  for (let i = 0; i < totalFrames; i++) {
+    const img = new Image();
+    const frameNumber = i.toString().padStart(2, '0');
+    img.src = `${imagePrefix}${frameNumber}${imageSuffix}`;
+    images.push(img);
+  }
+
+  // 循環播放函式
+  function playSequence() {
+    const frameNumber = currentFrame.toString().padStart(2, '0');
+    imageElement.src = `${imagePrefix}${frameNumber}${imageSuffix}`;
+    currentFrame++;
+    if (currentFrame >= totalFrames) {
+      currentFrame = 0;
+    }
+  }
+
+  // 設定定時器
+  setInterval(playSequence, frameRate);
+</script>
+
+</body>
+</html>
